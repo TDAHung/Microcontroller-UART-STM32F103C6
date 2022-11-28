@@ -26,7 +26,7 @@ int resend_flag = 0;
 char str[10];
 char *request = "RST";
 char *ok = "OK";
-char *led7seg= "7SEG:";
+char *led7seg = "7SEG:";
 
 void uart_communiation_fsm(void)
 {
@@ -47,13 +47,17 @@ void uart_communiation_fsm(void)
 			resend_flag = 1;
 			setTimerResend(RESENDING_TIME);
 		}
-		else if(strstr(command_data,led7seg) != NULL){
+		else if (strstr(command_data, led7seg) != NULL)
+		{
 			char str[10];
+			char strnum7[10];
 			int len7LED = strlen(led7seg);
 			int lenCommand = strlen(command_data);
-			strncpy(str,command_data + len7LED, lenCommand - len7LED);
-			str[lenCommand - len7LED] = '\0';
-			HAL_UART_Transmit(&huart2, (void *)str, printf("\r\n%s\r\n",str), 1000);
+			int num7seg;
+			strncpy(strnum7, command_data + len7LED, lenCommand - len7LED);
+			strnum7[lenCommand - len7LED] = '\0';
+			num7seg = atoi(strnum7);
+			HAL_UART_Transmit(&huart2, (void *)str, sprintf(str, "\r\n%ld\r\n", num7seg), 1000);
 			resend_flag = 1;
 			setTimerResend(RESENDING_TIME);
 		}
@@ -86,14 +90,18 @@ void uart_communiation_fsm(void)
 							  sprintf(str, "\r\n%ld", ADC_value), 1000);
 			setTimerResend(RESENDING_TIME);
 		}
-		else if(timerResend_flag == 1 && strstr(command_data,led7seg) != NULL){
+		else if (timerResend_flag == 1 && strstr(command_data, led7seg) != NULL)
+		{
 			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, SET);
 			char str[10];
+			char strnum7[10];
 			int len7LED = strlen(led7seg);
 			int lenCommand = strlen(command_data);
-			strncpy(str,command_data + len7LED, lenCommand - len7LED);
-			str[lenCommand - len7LED] = '\0';
-			HAL_UART_Transmit(&huart2, (void *)str,printf("%s\r\n",str), 1000);
+			int num7seg;
+			strncpy(strnum7, command_data + len7LED, lenCommand - len7LED);
+			strnum7[lenCommand - len7LED] = '\0';
+			num7seg = atoi(strnum7);
+			HAL_UART_Transmit(&huart2, (void *)str, sprintf(str, "\r\n%ld\r\n", num7seg), 1000);
 			setTimerResend(RESENDING_TIME);
 		}
 		break;
